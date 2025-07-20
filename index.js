@@ -28,6 +28,5 @@ app.get("/", (req, res) => {
   res.send("Welcome to the Bike Rentals API");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+const server = app;
+module.exports = (req, res) => server(req, res);
