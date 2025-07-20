@@ -2,13 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
-const connectDB = require("../db");
+const connectDB = require("./db");
 
 // Importing routers
-const AuthRouter = require("./routes/AuthRouter");
-const VehicleRouter = require("./routes/VehicleRoute");
-const AllVehiclesRouter = require("./routes/AllVehiclesRoute");
-const BookingRouter = require("./routes/BookingRoute");
+const AuthRouter = require("./src/routes/AuthRouter");
+const VehicleRouter = require("./src/routes/VehicleRoute");
+const AllVehiclesRouter = require("./src/routes/AllVehiclesRoute");
+const BookingRouter = require("./src/routes/BookingRoute");
 
 dotenv.config();
 connectDB();
