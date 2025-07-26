@@ -9,6 +9,7 @@ const AuthRouter = require("./src/routes/AuthRouter");
 const VehicleRouter = require("./src/routes/VehicleRoute");
 const AllVehiclesRouter = require("./src/routes/AllVehiclesRoute");
 const BookingRouter = require("./src/routes/BookingRoute");
+const AboutUsRouter = require("./src/routes/AboutUsRoute");
 
 dotenv.config();
 connectDB();
@@ -23,6 +24,7 @@ app.use("/auth", AuthRouter);
 app.use("/admin/vehicles", VehicleRouter);
 app.use("/allVehicles", AllVehiclesRouter);
 app.use("/booking", BookingRouter);
+app.use("/about-us", AboutUsRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the Bike Rentals API");
