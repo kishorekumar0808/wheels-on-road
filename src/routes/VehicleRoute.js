@@ -8,7 +8,7 @@ const {
 const adminsOnly = require("../middlewares/AdminsOnly");
 const authenticate = require("../middlewares/Authentication");
 
-router.get("/vehicles", authenticate, getVehicles);
+router.get("/", authenticate, getVehicles);
 router.post("/add", adminsOnly, addBike);
 router.patch("/update/:id", adminsOnly, updateBike);
 router.delete("/delete/:id", adminsOnly, deleteBike);

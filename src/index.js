@@ -5,11 +5,12 @@ const bodyParser = require("body-parser");
 const connectDB = require("./db");
 
 // Importing routers
-const AuthRouter = require("./src/routes/AuthRouter");
-const VehicleRouter = require("./src/routes/VehicleRoute");
-const AllVehiclesRouter = require("./src/routes/AllVehiclesRoute");
-const BookingRouter = require("./src/routes/BookingRoute");
-const AboutUsRouter = require("./src/routes/AboutUsRoute");
+const AuthRouter = require("./routes/AuthRouter");
+const VehicleRouter = require("./routes/VehicleRoute");
+const AllVehiclesRouter = require("./routes/AllVehiclesRoute");
+const BookingRouter = require("./routes/BookingRoute");
+const AboutUsRouter = require("./routes/AboutUsRoute");
+const ContactUsRouter = require("./routes/ContactUsRoute");
 
 dotenv.config();
 connectDB();
@@ -25,10 +26,12 @@ app.use("/admin/vehicles", VehicleRouter);
 app.use("/allVehicles", AllVehiclesRouter);
 app.use("/booking", BookingRouter);
 app.use("/about-us", AboutUsRouter);
+app.use("/contact-us", ContactUsRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the Bike Rentals API");
 });
 
 const server = app;
+
 module.exports = (req, res) => server(req, res);

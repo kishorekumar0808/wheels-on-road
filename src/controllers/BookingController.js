@@ -4,7 +4,7 @@ const VehicleModel = require("../models/VehicleModel");
 const createBooking = async (req, res) => {
   try {
     const { vehicleId, startTime, endTime } = req.body;
-    const userId = req.user.id; // use `.id` from decoded token
+    const userId = req.user.id;
 
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);

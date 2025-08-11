@@ -3,7 +3,6 @@ const AboutUs = require("../models/AboutUs");
 const getAboutUs = async (req, res) => {
   try {
     const aboutUsData = await AboutUs.find();
-    console.log("About Us Data:", aboutUsData);
     if (!aboutUsData || aboutUsData.length === 0) {
       return res.status(404).json({ message: "About Us data not found" });
     }

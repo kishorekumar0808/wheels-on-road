@@ -1,61 +1,47 @@
-const Bike = require("../models/VehicleModel");
+const {
+  getAllBikes,
+  createBike,
+  updateBikeById,
+  deleteBikeById,
+} = require("../service/vehicleService");
 
 const getVehicles = async (req, res) => {
   try {
-    const bikes = await Bike.find();
+    const bikes = await getAllBikes();
+    if (!bikes || bikes.length === 0) {
+      return res.status(404).json({ error: "No bikes found" });
+    }
     res.status(200).json({
       message: "Bikes fetched successfully",
       success: true,
       bikes,
     });
   } catch (error) {
-    console.error("Error fetching bikes:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
 const addBike = async (req, res) => {
   try {
-    const { brand, name, type, rentalPrice, image } = req.body;
-    const newBike = await Bike.create({
-      brand,
-      name,
-      type,
-      image,
-      rentalPrice,
-    });
+    const newBike = await createBike(req.body);
     res.status(201).json({
       message: "Bike added successfully",
       success: true,
       bike: newBike,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
 const updateBike = async (req, res) => {
   try {
     const { id } = req.params;
-
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({ error: "No fields provided for update" });
     }
 
-    const updateFields = {};
-
-    if (req.body.brand) updateFields.brand = req.body.brand;
-    if (req.body.name) updateFields.name = req.body.name;
-    if (req.body.type) updateFields.type = req.body.type;
-    if (req.body.rentalPrice) updateFields.rentalPrice = req.body.rentalPrice;
-    if ("availability" in req.body)
-      updateFields.availability = req.body.availability;
-    if (req.body.image) updateFields.image = req.body.image;
-
-    const updatedBike = await Bike.findByIdAndUpdate(id, updateFields, {
-      new: true,
-    });
-
+    const updatedBike = await updateBikeById(id, req.body);
     if (!updatedBike) {
       return res.status(404).json({ error: "Bike not found" });
     }
@@ -66,7 +52,6 @@ const updateBike = async (req, res) => {
       bike: updatedBike,
     });
   } catch (error) {
-    console.error("Update bike error:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -74,7 +59,7 @@ const updateBike = async (req, res) => {
 const deleteBike = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedBike = await Bike.findByIdAndDelete(id);
+    const deletedBike = await deleteBikeById(id);
     if (!deletedBike) {
       return res.status(404).json({ error: "Bike not found" });
     }
