@@ -7,7 +7,6 @@ const connectDB = require("./db");
 // Importing routers
 const AuthRouter = require("./routes/AuthRouter");
 const VehicleRouter = require("./routes/VehicleRoute");
-const AllVehiclesRouter = require("./routes/AllVehiclesRoute");
 const BookingRouter = require("./routes/BookingRoute");
 const AboutUsRouter = require("./routes/AboutUsRoute");
 const ContactUsRouter = require("./routes/ContactUsRoute");
@@ -23,7 +22,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use("/auth", AuthRouter);
 app.use("/admin/vehicles", VehicleRouter);
-app.use("/allVehicles", AllVehiclesRouter);
 app.use("/booking", BookingRouter);
 app.use("/about-us", AboutUsRouter);
 app.use("/contact-us", ContactUsRouter);
