@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 8000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use("/auth", AuthRouter);
-app.use("/admin/vehicles", VehicleRouter);
+app.use("/vehicles", VehicleRouter);
 app.use("/booking", BookingRouter);
 app.use("/about-us", AboutUsRouter);
 app.use("/contact-us", ContactUsRouter);
@@ -31,4 +31,7 @@ app.get("/", (req, res) => {
 });
 
 const server = app;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 module.exports = (req, res) => server(req, res);
