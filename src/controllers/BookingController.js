@@ -1,40 +1,17 @@
-const BookingModel = require("../models/BookingModel");
-const VehicleModel = require("../models/VehicleModel");
+const {
+  createBooking,
+  getBookingHistory,
+} = require("../service/bikeBookingService");
+const Booking = require("../models/BookingModel.js");
+const Vehicle = require("../models/VehicleModel.js");
+const cron = require("node-cron");
 
-const createBooking = async (req, res) => {
+const createBookingController = async (req, res) => {
   try {
     const { vehicleId, startTime, endTime } = req.body;
     const userId = req.user.id;
 
-    const startDate = new Date(startTime);
-    const endDate = new Date(endTime);
-    if (startDate >= endDate) {
-      return res
-        .status(400)
-        .json({ error: "Start time must be before end time" });
-    }
-
-    const vehicle = await VehicleModel.findById(vehicleId);
-    if (!vehicle || !vehicle.availability) {
-      return res.status(404).json({ error: "Vehicle not available" });
-    }
-
-    const millisecondsPerDay = 24 * 60 * 60 * 1000;
-    const days = Math.ceil((endDate - startDate) / millisecondsPerDay);
-    const totalPrice = days * vehicle.rentalPrice;
-
-    const booking = await BookingModel.create({
-      userId,
-      vehicleId,
-      startDate,
-      endDate,
-      totalPrice,
-      status: "Confirmed", // ✅ match schema enum (capital C)
-    });
-
-    await VehicleModel.findByIdAndUpdate(vehicleId, {
-      availability: false,
-    });
+    const booking = await createBooking(userId, vehicleId, startTime, endTime);
 
     res.status(201).json({
       message: "Booking created successfully",
@@ -47,6 +24,45 @@ const createBooking = async (req, res) => {
   }
 };
 
+const getBookingHistoryController = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const bookings = await getBookingHistory(userId);
+
+    res.status(200).json({
+      success: true,
+      bookings,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+function startBookingScheduler() {
+  // Run every 1 minute
+  cron.schedule("* * * * *", async () => {
+    try {
+      const now = new Date();
+
+      const expiredBookings = await Booking.find({
+        endDate: { $lt: now },
+      });
+
+      for (const booking of expiredBookings) {
+        await Vehicle.findByIdAndUpdate(booking.vehicleId, { isBooked: false });
+      }
+
+      if (expiredBookings.length > 0) {
+        console.log(`✅ Released ${expiredBookings.length} vehicles`);
+      }
+    } catch (err) {
+      console.error("❌ Error releasing vehicles:", err);
+    }
+  });
+}
+
 module.exports = {
-  createBooking,
+  createBookingController,
+  getBookingHistoryController,
+  startBookingScheduler,
 };

@@ -10,6 +10,7 @@ const VehicleRouter = require("./routes/VehicleRoute");
 const BookingRouter = require("./routes/BookingRoute");
 const AboutUsRouter = require("./routes/AboutUsRoute");
 const ContactUsRouter = require("./routes/ContactUsRoute");
+const { startBookingScheduler } = require("./controllers/BookingController");
 
 dotenv.config();
 connectDB();
@@ -26,9 +27,15 @@ app.use("/booking", BookingRouter);
 app.use("/about-us", AboutUsRouter);
 app.use("/contact-us", ContactUsRouter);
 
+//cron job to release expired bookings
+startBookingScheduler();
+
 app.get("/", (req, res) => {
   res.send("Welcome to the Bike Rentals API");
 });
 
 const server = app;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 module.exports = (req, res) => server(req, res);

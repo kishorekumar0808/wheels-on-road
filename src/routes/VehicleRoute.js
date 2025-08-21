@@ -6,7 +6,6 @@ const {
   getVehicles,
 } = require("../controllers/VehicleController");
 const adminsOnly = require("../middlewares/AdminsOnly");
-const authenticate = require("../middlewares/Authentication");
 
 router.get("/", getVehicles);
 router.post("/add", adminsOnly, addBike);
