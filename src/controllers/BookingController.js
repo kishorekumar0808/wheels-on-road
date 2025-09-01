@@ -44,19 +44,23 @@ const startBookingScheduler = () => {
       const now = new Date();
       const expiredBookings = await BookingModel.find({
         endDate: { $lt: now },
+        status: "Confirmed",
       });
 
       for (const booking of expiredBookings) {
+        //mark booking as completed
+        booking.status = "Completed";
+        await booking.save();
+
+        //set vehicle availability to true
         await VehicleModel.findByIdAndUpdate(booking.vehicleId, {
           availability: true,
         });
 
-        await BookingModel.findByIdAndUpdate(booking._id, {
-          status: "Completed",
-        });
+        console.log(
+          `🔄 Booking ${booking._id} marked as Completed and vehicle ${booking.vehicleId} available`
+        );
       }
-
-      console.log("✅ Expired bookings processed and vehicles released");
     } catch (err) {
       console.error("❌ Error releasing vehicles:", err);
     }

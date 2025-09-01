@@ -3,16 +3,28 @@ const VehicleModel = require("../models/VehicleModel");
 
 // Create booking
 const createBooking = async (userId, vehicleId, startDate, endDate) => {
+  console.log("vehicleId:--->", vehicleId);
   try {
+    const currentDate = new Date();
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    if (start >= end) {
-      throw new Error("Start time must be before end time");
+    console.log("Current Date:", currentDate.toISOString());
+    console.log("Start Date:", start.toISOString());
+    console.log("End Date:", end.toISOString());
+
+    if (start <= currentDate) {
+      throw new Error("Start date must be in the future");
     }
 
-    const vehicle = await VehicleModel.findById(vehicleId);
-    if (!vehicle || !vehicle.availability) {
+    if (end <= start) {
+      throw new Error("End date must be after start date");
+    }
+
+    const vehicle = await VehicleModel.findOne({ _id: vehicleId });
+
+    console.log("Vehicle found:", vehicle);
+    if (!vehicle) {
       throw new Error("Vehicle not available");
     }
 
@@ -29,14 +41,12 @@ const createBooking = async (userId, vehicleId, startDate, endDate) => {
       status: "Confirmed",
     });
 
-    await VehicleModel.findByIdAndUpdate(vehicleId, {
-      availability: false,
-    });
+    await VehicleModel.findByIdAndUpdate(vehicleId, { availability: false });
 
     return booking;
   } catch (error) {
-    console.error("Error creating booking:", error);
-    throw new Error("Failed to create booking");
+    console.error("Error creating booking:", error.message);
+    throw error;
   }
 };
 
