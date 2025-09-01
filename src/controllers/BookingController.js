@@ -1,17 +1,17 @@
+const cron = require("node-cron");
 const {
   createBooking,
   getBookingHistory,
 } = require("../service/bikeBookingService");
-const Booking = require("../models/BookingModel.js");
-const Vehicle = require("../models/VehicleModel.js");
-const cron = require("node-cron");
+const BookingModel = require("../models/BookingModel.js");
+const VehicleModel = require("../models/VehicleModel.js");
 
 const createBookingController = async (req, res) => {
   try {
-    const { vehicleId, startTime, endTime } = req.body;
+    const { vehicleId, startDate, endDate } = req.body;
     const userId = req.user.id;
 
-    const booking = await createBooking(userId, vehicleId, startTime, endTime);
+    const booking = await createBooking(userId, vehicleId, startDate, endDate);
 
     res.status(201).json({
       message: "Booking created successfully",
@@ -38,28 +38,30 @@ const getBookingHistoryController = async (req, res) => {
   }
 };
 
-function startBookingScheduler() {
-  // Run every 1 minute
-  cron.schedule("* * * * *", async () => {
+const startBookingScheduler = () => {
+  cron.schedule("0 * * * *", async () => {
     try {
       const now = new Date();
-
-      const expiredBookings = await Booking.find({
+      const expiredBookings = await BookingModel.find({
         endDate: { $lt: now },
       });
 
       for (const booking of expiredBookings) {
-        await Vehicle.findByIdAndUpdate(booking.vehicleId, { isBooked: false });
+        await VehicleModel.findByIdAndUpdate(booking.vehicleId, {
+          availability: true,
+        });
+
+        await BookingModel.findByIdAndUpdate(booking._id, {
+          status: "Completed",
+        });
       }
 
-      if (expiredBookings.length > 0) {
-        console.log(`✅ Released ${expiredBookings.length} vehicles`);
-      }
+      console.log("✅ Expired bookings processed and vehicles released");
     } catch (err) {
       console.error("❌ Error releasing vehicles:", err);
     }
   });
-}
+};
 
 module.exports = {
   createBookingController,

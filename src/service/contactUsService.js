@@ -1,6 +1,6 @@
-import ContactUs from "../models/ContactUsModel.js";
+const { ContactUs } = require("../models/ContactUsModel");
 
-export const contactUsService = async ({ name, email, phone, message }) => {
+const contactUsService = async ({ name, email, phone, message }) => {
   if (!name || !email || !phone || !message) {
     throw new Error("All fields are required");
   }
@@ -22,3 +22,5 @@ export const contactUsService = async ({ name, email, phone, message }) => {
     throw new Error(error.message);
   }
 };
+
+module.exports = { contactUsService };

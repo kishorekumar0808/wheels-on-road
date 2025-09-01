@@ -1,13 +1,13 @@
-import BookingModel from "../models/BookingModel.js";
-import VehicleModel from "../models/VehicleModel.js";
+const BookingModel = require("../models/BookingModel");
+const VehicleModel = require("../models/VehicleModel");
 
 // Create booking
-export const createBooking = async (userId, vehicleId, startTime, endTime) => {
+const createBooking = async (userId, vehicleId, startDate, endDate) => {
   try {
-    const startDate = new Date(startTime);
-    const endDate = new Date(endTime);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-    if (startDate >= endDate) {
+    if (start >= end) {
       throw new Error("Start time must be before end time");
     }
 
@@ -17,14 +17,14 @@ export const createBooking = async (userId, vehicleId, startTime, endTime) => {
     }
 
     const millisecondsPerDay = 24 * 60 * 60 * 1000;
-    const days = Math.ceil((endDate - startDate) / millisecondsPerDay);
+    const days = Math.ceil((end - start) / millisecondsPerDay);
     const totalPrice = days * vehicle.rentalPrice;
 
     const booking = await BookingModel.create({
       userId,
       vehicleId,
-      startDate,
-      endDate,
+      startDate: start,
+      endDate: end,
       totalPrice,
       status: "Confirmed",
     });
@@ -41,7 +41,7 @@ export const createBooking = async (userId, vehicleId, startTime, endTime) => {
 };
 
 // Get booking history
-export const getBookingHistory = async (userId) => {
+const getBookingHistory = async (userId) => {
   try {
     const bookings = await BookingModel.find({ userId })
       .populate("vehicleId", "name model rentalPrice")
@@ -52,4 +52,9 @@ export const getBookingHistory = async (userId) => {
     console.error("Error fetching booking history:", error);
     throw new Error("Failed to fetch booking history");
   }
+};
+
+module.exports = {
+  createBooking,
+  getBookingHistory,
 };
