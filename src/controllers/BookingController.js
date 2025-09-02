@@ -8,10 +8,25 @@ const VehicleModel = require("../models/VehicleModel.js");
 
 const createBookingController = async (req, res) => {
   try {
-    const { vehicleId, startDate, endDate } = req.body;
+    const {
+      vehicleId,
+      startDate,
+      endDate,
+      userName,
+      phoneNumber,
+      requirements,
+    } = req.body;
     const userId = req.user.id;
 
-    const booking = await createBooking(userId, vehicleId, startDate, endDate);
+    const booking = await createBooking(
+      userId,
+      userName,
+      phoneNumber,
+      requirements,
+      vehicleId,
+      startDate,
+      endDate
+    );
 
     res.status(201).json({
       message: "Booking created successfully",
@@ -39,7 +54,10 @@ const getBookingHistoryController = async (req, res) => {
 };
 
 const startBookingScheduler = () => {
-  cron.schedule("0 * * * *", async () => {
+  //for hourly cron job
+  cron.schedule("0 * * * * *", async () => {
+    console.log("Running cron every 10 sec for testing...");
+
     try {
       const now = new Date();
       const expiredBookings = await BookingModel.find({
@@ -56,7 +74,6 @@ const startBookingScheduler = () => {
         await VehicleModel.findByIdAndUpdate(booking.vehicleId, {
           availability: true,
         });
-
         console.log(
           `🔄 Booking ${booking._id} marked as Completed and vehicle ${booking.vehicleId} available`
         );
