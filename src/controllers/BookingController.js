@@ -56,8 +56,6 @@ const getBookingHistoryController = async (req, res) => {
 const startBookingScheduler = () => {
   //for hourly cron job
   cron.schedule("0 * * * * *", async () => {
-    console.log("Running cron every 10 sec for testing...");
-
     try {
       const now = new Date();
       const expiredBookings = await BookingModel.find({
