@@ -1,4 +1,4 @@
-const AboutUs = require("../models/AboutUs");
+const AboutUs = require("../schemas/AboutUs");
 
 const getAboutUs = async (req, res) => {
   try {

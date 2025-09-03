@@ -1,5 +1,5 @@
-const BookingModel = require("../models/BookingModel");
-const VehicleModel = require("../models/VehicleModel");
+const BookingModel = require("../schemas/BookingModel");
+const VehicleModel = require("../schemas/VehicleModel");
 const { generateShortId } = require("../utils/commonMethods");
 
 // Create booking
@@ -12,7 +12,6 @@ const createBooking = async (
   startDate,
   endDate
 ) => {
-  console.log("vehicleId:--->", vehicleId);
   try {
     const currentDate = new Date();
     const start = new Date(startDate);

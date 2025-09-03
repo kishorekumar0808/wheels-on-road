@@ -1,4 +1,4 @@
-const UserModel = require("../models/UserModel");
+const UserModel = require("../schemas/UserModel");
 const jwt = require("jsonwebtoken");
 
 const adminsOnly = async (req, res, next) => {

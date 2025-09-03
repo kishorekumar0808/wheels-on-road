@@ -1,4 +1,4 @@
-const { ContactUs } = require("../models/ContactUsModel");
+const { ContactUs } = require("../schemas/ContactUsModel");
 
 const contactUsService = async ({ name, email, phone, message }) => {
   if (!name || !email || !phone || !message) {

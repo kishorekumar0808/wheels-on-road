@@ -3,8 +3,8 @@ const {
   createBooking,
   getBookingHistory,
 } = require("../service/bikeBookingService");
-const BookingModel = require("../models/BookingModel.js");
-const VehicleModel = require("../models/VehicleModel.js");
+const BookingModel = require("../schemas/BookingModel");
+const VehicleModel = require("../schemas/VehicleModel");
 
 const createBookingController = async (req, res) => {
   try {
