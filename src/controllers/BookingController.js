@@ -39,17 +39,25 @@ const getBookingHistoryController = async (req, res) => {
 };
 
 function startBookingScheduler() {
-  // Run every 1 minute
   cron.schedule("* * * * *", async () => {
     try {
       const now = new Date();
 
+      // Find confirmed bookings that have expired
       const expiredBookings = await Booking.find({
         endDate: { $lt: now },
+        status: "Confirmed", // Only release confirmed bookings
       });
 
       for (const booking of expiredBookings) {
-        await Vehicle.findByIdAndUpdate(booking.vehicleId, { isBooked: false });
+        // Update vehicle availability
+        await Vehicle.findByIdAndUpdate(booking.vehicleId, {
+          availability: true, // Changed from isBooked to availability
+        });
+        // Update booking status
+        await Booking.findByIdAndUpdate(booking._id, {
+          status: "Completed",
+        });
       }
 
       if (expiredBookings.length > 0) {
