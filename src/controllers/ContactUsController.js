@@ -5,11 +5,13 @@ const contactUsDetails = async (req, res) => {
 
   try {
     const result = await contactUsService({ name, email, phone, message });
-    res.status(201).json({ result, message: "success" });
+    if (!result) {
+      return res.status(400).json({ error: "Failed to save contact details" });
+    }
+    return res.status(201).json({ result, message: "success" });
   } catch (error) {
-    console.error("Error updating bike:", error);
-    res.status(500).json({ error: error.message });
-    return;
+    console.error("Error saving contact details:", error);
+    return res.status(500).json({ error: error.message });
   }
 };
 

@@ -1,17 +1,32 @@
+const cron = require("node-cron");
 const {
   createBooking,
   getBookingHistory,
 } = require("../service/bikeBookingService");
-const Booking = require("../models/BookingModel.js");
-const Vehicle = require("../models/VehicleModel.js");
-const cron = require("node-cron");
+const BookingModel = require("../schemas/BookingModel");
+const VehicleModel = require("../schemas/VehicleModel");
 
 const createBookingController = async (req, res) => {
   try {
-    const { vehicleId, startTime, endTime } = req.body;
+    const {
+      vehicleId,
+      startDate,
+      endDate,
+      userName,
+      phoneNumber,
+      requirements,
+    } = req.body;
     const userId = req.user.id;
 
-    const booking = await createBooking(userId, vehicleId, startTime, endTime);
+    const booking = await createBooking(
+      userId,
+      userName,
+      phoneNumber,
+      requirements,
+      vehicleId,
+      startDate,
+      endDate
+    );
 
     res.status(201).json({
       message: "Booking created successfully",
@@ -44,24 +59,23 @@ function startBookingScheduler() {
       const now = new Date();
 
       // Find confirmed bookings that have expired
-      const expiredBookings = await Booking.find({
+      const expiredBookings = await BookingModel.find({
         endDate: { $lt: now },
         status: "Confirmed", // Only release confirmed bookings
       });
 
       for (const booking of expiredBookings) {
         // Update vehicle availability
-        await Vehicle.findByIdAndUpdate(booking.vehicleId, {
-          availability: true, // Changed from isBooked to availability
+        await VehicleModel.findByIdAndUpdate(booking.vehicleId, {
+          availability: true,
         });
         // Update booking status
-        await Booking.findByIdAndUpdate(booking._id, {
+        await BookingModel.findByIdAndUpdate(booking._id, {
           status: "Completed",
         });
-      }
-
-      if (expiredBookings.length > 0) {
-        console.log(`✅ Released ${expiredBookings.length} vehicles`);
+        console.log(
+          `🔄 Booking ${booking._id} marked as Completed and vehicle ${booking.vehicleId} available`
+        );
       }
     } catch (err) {
       console.error("❌ Error releasing vehicles:", err);

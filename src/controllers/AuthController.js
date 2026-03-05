@@ -1,20 +1,12 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const UserModel = require("../models/UserModel");
+const {
+  handleSignUp,
+  handleLogin,
+} = require("../service/userAuthenticationService");
 
 const signup = async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
-    const user = await UserModel.findOne({ email });
-    if (user) {
-      return res.status(403).json({
-        message: "User already exists with this email, please try another one",
-        success: false,
-      });
-    }
-    const newUser = new UserModel({ name, email, phone, password });
-    newUser.password = await bcrypt.hash(password, 10);
-    await newUser.save();
+    await handleSignUp(name, email, phone, password);
     res
       .status(201)
       .json({ message: "User created successfully", success: true });
@@ -27,19 +19,11 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      return res
-        .status(400)
-        .json({ error: "User does not exist please signup" });
+    const { user, token } = await handleLogin(email, password);
+    if (!user || !token) {
+      return res.status(400).json({ error: "Invalid credentials" });
     }
-    const checkPassword = await bcrypt.compare(password, user.password);
-    if (!checkPassword) {
-      return res.status(400).json({ error: "Invalid password" });
-    }
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
-    });
+
     res.status(201).json({
       message: `logged successfully`,
       success: true,
