@@ -53,24 +53,25 @@ const getBookingHistoryController = async (req, res) => {
   }
 };
 
-const startBookingScheduler = () => {
-  //for hourly cron job
-  cron.schedule("0 * * * * *", async () => {
+function startBookingScheduler() {
+  cron.schedule("* * * * *", async () => {
     try {
       const now = new Date();
+
+      // Find confirmed bookings that have expired
       const expiredBookings = await BookingModel.find({
         endDate: { $lt: now },
-        status: "Confirmed",
+        status: "Confirmed", // Only release confirmed bookings
       });
 
       for (const booking of expiredBookings) {
-        //mark booking as completed
-        booking.status = "Completed";
-        await booking.save();
-
-        //set vehicle availability to true
+        // Update vehicle availability
         await VehicleModel.findByIdAndUpdate(booking.vehicleId, {
           availability: true,
+        });
+        // Update booking status
+        await BookingModel.findByIdAndUpdate(booking._id, {
+          status: "Completed",
         });
         console.log(
           `🔄 Booking ${booking._id} marked as Completed and vehicle ${booking.vehicleId} available`
@@ -80,7 +81,7 @@ const startBookingScheduler = () => {
       console.error("❌ Error releasing vehicles:", err);
     }
   });
-};
+}
 
 module.exports = {
   createBookingController,
