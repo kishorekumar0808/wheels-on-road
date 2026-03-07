@@ -3,12 +3,17 @@ const jwt = require("jsonwebtoken");
 
 const adminsOnly = async (req, res, next) => {
   try {
-    const token = req.headers["authorization"];
-    if (!token) {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader) {
       return res.status(403).json({ error: "Unauthorized, Token is required" });
     }
+    if (!authHeader.startsWith("Bearer ")) {
+      return res.status(403).json({ error: "Invalid token format" });
+    }
+    const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await UserModel.findById(decoded.id);
+
     if (!user || !user.isAdmin) {
       return res.status(404).json({ message: "Access denied. Admins only." });
     }
